@@ -1,7 +1,6 @@
-fastapi==0.115.6
+fastapi[standard]
 uvicorn[standard]==0.34.0
 
-SQLAlchemy==2.0.36
 pydantic==2.10.4
 python-json-logger==3.2.1
 
