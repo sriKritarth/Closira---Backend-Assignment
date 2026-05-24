@@ -19,9 +19,7 @@ def init_db():
         conn.execute(
             
             """
-            CREATE TABLE ENQUIRY IF NOT EXISTS(
-
-                CREATE TABLE IF NOT EXISTS enquiries (
+            CREATE TABLE IF NOT EXISTS enquiries(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 channel TEXT NOT NULL,
                 customer_name TEXT NOT NULL,
@@ -70,4 +68,4 @@ def init_db():
             """
         )
 
-        conn.close()
+    conn.close()
