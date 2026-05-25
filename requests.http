@@ -1,0 +1,58 @@
+### Health Check
+GET http://127.0.0.1:8000/health
+
+
+### Create Pricing Enquiry
+POST http://127.0.0.1:8000/enquiry
+Content-Type: application/json
+
+{
+  "channel": "whatsapp",
+  "customer_name": "Priya S",
+  "message": "Hi, what is your pricing?"
+}
+
+
+### Create Booking Enquiry
+POST http://127.0.0.1:8000/enquiry
+Content-Type: application/json
+
+{
+  "channel": "call",
+  "customer_name": "Rohan M",
+  "message": "I want to book a demo meeting."
+}
+
+
+### Create Unknown Enquiry For Auto Escalation
+POST http://127.0.0.1:8000/enquiry
+Content-Type: application/json
+
+{
+  "channel": "email",
+  "customer_name": "Alex K",
+  "message": "Blue mango laptop river."
+}
+
+
+### Get Enquiry History
+GET http://127.0.0.1:8000/enquiry/1/history
+
+
+### Schedule Follow-Up
+POST http://127.0.0.1:8000/enquiry/1/follow-up
+Content-Type: application/json
+
+{
+  "delay_minutes": 30,
+  "message_template": "Hi, just checking if you had a chance to review our pricing."
+}
+
+
+### Escalate Enquiry
+POST http://127.0.0.1:8000/enquiry/1/escalate
+Content-Type: application/json
+
+{
+  "reason": "Customer requested human support."
+}
