@@ -3,7 +3,7 @@ from typing import Literal
 
 
 class CreateEnquiryRequest(BaseModel):
-    channel : Literal['whatsApp' , 'email' , 'call'] = Field(... , description="Channels from which enquiry is recieved")
+    channel : Literal['whatsapp' , 'email' , 'call'] = Field(... , description="Channels from which enquiry is recieved")
     customer_name : str = Field(... ,min_length=2 , max_length = 100 ,  description = "Name of the customer sending the enquiry")
     message : str = Field(... ,min_length= 5 , max_length=1000 ,  description="Customer enquiry message")
 

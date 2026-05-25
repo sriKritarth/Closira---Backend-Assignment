@@ -1,5 +1,7 @@
 from app.database import get_connection
 import sqlite3
+from typing import Optional
+from datetime import datetime , timedelta, timezone
 
 
 def create_enquiry(channel , customer_name , message ):
@@ -80,7 +82,69 @@ def auto_escalate_enquiry(enquiry_id, reason="No matching SOP found"):
 
     conn.commit()
     conn.close()
-    
-    
 
+
+def row_to_dict(row):
+    if row is None:
+        return None
+    return dict(row)
+
+
+def rows_to_dicts(rows):
+    return [dict(row) for row in rows]
+
+
+def get_events_by_enquiry_id(enquiry_id: int):
+    conn = get_connection()
+
+    events = conn.execute(
+        """
+        SELECT id, enquiry_id, event_type, description, event_metadata, created_at
+        FROM enquiry_events
+        WHERE enquiry_id = ?
+        ORDER BY created_at ASC, id ASC
+        """,
+        (enquiry_id,),
+    ).fetchall()
+
+    conn.close()
+    return events
+
+
+def get_follow_ups_by_enquiry_id(enquiry_id: int):
+    conn = get_connection()
+
+    follow_ups = conn.execute(
+        """
+        SELECT id, enquiry_id, delay_minutes, message_template, scheduled_for, status, created_at
+        FROM follow_ups
+        WHERE enquiry_id = ?
+        ORDER BY scheduled_for ASC, id ASC
+        """,
+        (enquiry_id,),
+    ).fetchall()
+
+    conn.close()
+    return follow_ups
+
+
+def create_follow_up(enquiry_id: int, delay_minutes: int, message_template: Optional[str] = None):
+    scheduled_for = (datetime.now(tz=timezone.UTC) + timedelta(minutes=delay_minutes)).isoformat()
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO follow_ups(enquiry_id, delay_minutes, message_template, scheduled_for, status)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (enquiry_id, delay_minutes, message_template, scheduled_for, "scheduled"),
+    )
+
+    follow_up_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+
+    return follow_up_id, scheduled_for
 

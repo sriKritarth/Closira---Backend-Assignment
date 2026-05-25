@@ -67,5 +67,5 @@ def init_db():
 
             """
         )
-
+        
     conn.close()
