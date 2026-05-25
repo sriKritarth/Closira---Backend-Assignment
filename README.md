@@ -121,11 +121,48 @@ For production, I would use Celery or another proper job queue system.
 
 ## 6. Features Implemented
 
-### Enquiry Creation
+This backend implements the core enquiry-handling workflow required for the Closira backend assignment. The system accepts customer enquiries, processes them in the background, matches them with predefined SOPs, supports follow-up scheduling, handles escalation, and exposes enquiry history.
 
-Creates a new inbound customer enquiry and immediately returns a job ID.
+Each feature below maps directly to the assignment requirements and the implemented API endpoints.
+
+---
+
+### 6.1 Health Check
+
+Endpoint:
+
+```http
+GET /health
+```
+
+### 6.2 Create New Enquiry
 
 Endpoint:
 
 ```http
 POST /enquiry
+```
+
+### 6.3 Async Background Processing and retrieving history
+
+Endpoint:
+
+```http
+GET /enquiry/{enquiry_id}/history
+```
+
+### 6.4 Schedule Follow-up
+
+Endpoint:
+
+```http
+POST /enquiry/{enquiry_id}/follow-up
+```
+
+### 6.5 Escalation Enquiry
+
+Endpoint:
+
+```http
+POST /enquiry/{enquiry_id}/escalate
+```
