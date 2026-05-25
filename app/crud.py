@@ -165,3 +165,22 @@ def update_enquiry_status(enquiry_id: int, status: str):
     conn.commit()
     conn.close()
 
+
+
+def manual_escalate_enquiry(enquiry_id, reason):
+    conn = get_connection()
+
+    conn.execute(
+        """
+        UPDATE enquiries
+        SET 
+            status = ?,
+            escalation_reason = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        ("escalated", reason, enquiry_id)
+    )
+
+    conn.commit()
+    conn.close()

@@ -3,7 +3,8 @@ from fastapi import APIRouter , BackgroundTasks , HTTPException
 from app.schemas import (
     CreateEnquiryRequest , 
     CreateEnquiryResponse, 
-    FollowUpRequest
+    FollowUpRequest, 
+    EscalationRequest
 )
 from app.crud import (
     create_enquiry , 
@@ -14,8 +15,10 @@ from app.crud import (
     row_to_dict , 
     rows_to_dicts,
     update_enquiry_status ,
-    create_follow_up
+    create_follow_up ,
+    manual_escalate_enquiry
 )
+
 from app.services import process_enquiry
 
 
@@ -99,3 +102,37 @@ async def schedule_follow_up(enquiry_id: int, payload: FollowUpRequest):
     }
 
 
+
+@router_enquiry.post("/enquiry/{enquiry_id}/escalate")
+async def escalate_enquiry(enquiry_id: int, payload: EscalationRequest):
+    enquiry = get_enquiry_by_id(enquiry_id)
+
+    if not enquiry:
+        raise HTTPException(
+            status_code=404,
+            detail="Enquiry not found"
+        )
+
+    manual_escalate_enquiry(
+        enquiry_id=enquiry_id,
+        reason=payload.reason
+    )
+
+    create_enquiry_event(
+        enquiry_id,
+        "manual_escalated",
+        "Enquiry manually escalated to human agent",
+        json.dumps(
+            {
+                "reason": payload.reason,
+                "triggered_by": "manual_api_request"
+            }
+        )
+    )
+
+    return {
+        "enquiry_id": enquiry_id,
+        "status": "escalated",
+        "reason": payload.reason,
+        "message": "Enquiry escalated successfully"
+    }
