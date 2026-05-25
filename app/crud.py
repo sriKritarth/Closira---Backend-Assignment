@@ -1,7 +1,8 @@
 from app.database import get_connection
 import sqlite3
 from typing import Optional
-from datetime import datetime , timedelta, timezone
+import time
+from datetime import timedelta , datetime , timezone
 
 
 def create_enquiry(channel , customer_name , message ):
@@ -129,7 +130,7 @@ def get_follow_ups_by_enquiry_id(enquiry_id: int):
 
 
 def create_follow_up(enquiry_id: int, delay_minutes: int, message_template: Optional[str] = None):
-    scheduled_for = (datetime.now(tz=timezone.UTC) + timedelta(minutes=delay_minutes)).isoformat()
+    scheduled_for = (datetime.now(timezone.utc)  + timedelta(minutes=delay_minutes)).strftime("%Y-%m-%d %H:%M UTC")
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -147,4 +148,20 @@ def create_follow_up(enquiry_id: int, delay_minutes: int, message_template: Opti
     conn.close()
 
     return follow_up_id, scheduled_for
+
+
+def update_enquiry_status(enquiry_id: int, status: str):
+    conn = get_connection()
+
+    conn.execute(
+        """
+        UPDATE enquiries
+        SET status = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (status, enquiry_id),
+    )
+
+    conn.commit()
+    conn.close()
 
